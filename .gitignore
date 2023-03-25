@@ -1,4 +1,5 @@
 .DS_Store
+*~
 compiled/
 *.elc
 doc/*.texi~
@@ -10,3 +11,4 @@ doc/*.svg
 # ELPA-generated files
 /racket-mode-autoloads.el
 /racket-mode-pkg.el
+expanded-syntax
