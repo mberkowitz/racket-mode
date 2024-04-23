@@ -659,6 +659,31 @@ the variable `racket-before-run-hook'."
                       (_     racket-error-context))
                     #'racket-edit-switch-to-repl))
 
+(defvar racket-run-main-args-history nil)
+
+(defun racket-run-read-args ()          ;factor out to placate edebug
+  (let ((local-default-args
+         (and (null racket-run-main-args-history)
+              (not (null racket-user-command-line-arguments))
+              (string-join racket-user-command-line-arguments " "))))
+    (read-string "command-line arguments:" nil
+                 'racket-run-main-args-history
+                 (or racket-run-main-args-history local-default-args))))
+
+(defun racket-run-main (&optional args prefix)
+  "Save the buffer and run its module main, passing command-line ARGS (a string).
+Interactively, like `racket-run', but prompts for commmand line arguments."
+  (interactive
+   (let ((args (racket-run-read-args))) ;placate edebug
+     (list args current-prefix-arg)))
+  (setq racket-user-command-line-arguments (string-split args))
+  (racket--repl-run (list (racket--buffer-file-name) 'main)
+                    '()
+                    (pcase prefix
+                      (`(4)  'high)
+                      (`(16) 'debug)
+                      (_     racket-error-context))))
+
 (defun racket-test (&optional prefix)
   "Run the \"test\" submodule.
 
